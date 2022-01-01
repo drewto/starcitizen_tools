@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def ingest_args():
@@ -71,11 +71,191 @@ def parse_gift_entries(raw_gift_entries):
     Returns a list of dicts, one per gift entry.
     '''
 
+    # Create an empty list to put the resulting entries in
+    parsed_gift_entries = []
+
+    # Iterate through the entries
+    for raw_gift_entry in raw_gift_entries:
+        
+        # Parse the entry
+        parsed_gift_entries.append(_parse_gift_entry(raw_gift_entry))
+    
+    # Return the resulting list of parsed gift entries
+    return parsed_gift_entries
+        
+
+def _parse_gift_entry(raw_gift_entry):
+    '''
+    Helper function that parses a single
+    gift entry.
+    '''
+
     # Example gift entry:
     # 'Dec 30 2021, 10:52 pm - Standalone Ship - Origin G12 - Warbond #69696969 - Gifted to recipient@mail.com, value: $420.00 USD'
 
-    # Extract the date and time
-    d
+    # Split entry string by ' - '
+    raw_gift_entry_split = raw_gift_entry.split(' - ')
+
+    # Extract the date and time (first item in the list)
+    date_time_string = raw_gift_entry_split.pop(0)
+    
+    # Convert the am/pm at the end to AM/PM to follow us_en locale
+    # Example: 'Dec 30 2021, 10:52 pm' -> 'Dec 30 2021, 10:52 PM'
+    date_time_string = date_time_string[:-2] + date_time_string[-2:].upper()
+
+    # Parse the date time string. Example: 'Dec 30 2021, 10:52 PM'
+    datetime_object = datetime.strptime(date_time_string, '%b %d %Y, %I:%M %p')
+
+    # The last item in raw_gift_entry_split is the recipient and value.
+    # Example: 'Gifted to recipient@mail.com, value: $420.00 USD'
+    recipient_and_value = raw_gift_entry_split.pop(-1)
+
+    # Extract recipient
+    recipient = recipient_and_value.split(', ')[0].split(' ')[-1]
+
+    # Extract value
+    value = float(recipient_and_value.split(', ')[-1].split('$')[-1].split(' ')[0])
+
+    # Build the parsed entry dict
+    parsed_gift_entry = {
+        'time': datetime_object,
+        'recipient': recipient,
+        'value': value
+    }
+
+    # Return the parsed entry dict
+    return parsed_gift_entry
+
+
+def build_calendar(parsed_gift_entries):
+    '''
+    Ingests a list of parsed gift entries,
+    finds the earliest date in gift entries
+    (to be called the start date) and latest
+    date in gift entries + 24 hours (to be called
+    the end date). Using these dates, it creates
+    a calendar of every minute between the start
+    and end dates, then populates each minute
+    with the total value of ships/items gifted in
+    the 24 hours leading up to that minute.
+    '''
+
+    # Find start date
+    start_date = find_earliest_date(parsed_gift_entries)
+
+    # Find end date
+    end_date = find_latest_date(parsed_gift_entries) + timedelta(days=1)
+
+    # Calculate number of minutes between start and end date
+    calendar_length = int((end_date - start_date).total_seconds()/60)
+
+    # Build a blank calendar with that number of entries
+    calendar = [0 for i in range(calendar_length)]
+
+    # Add entries to the calendar
+    for entry in parsed_gift_entries:
+        calendar = add_entry_to_calendar(entry, calendar, start_date)
+
+    # Return the populated calendar
+    return calendar, start_date
+  
+
+def find_earliest_date(parsed_gift_entries):
+    '''
+    Given a list of parsed gift entries,
+    this function finds the earliest date
+    among them.
+    '''
+
+    # Create a basic max date object to start comparisons
+    earliest_date = datetime.max
+
+    # Iterate through gift entries
+    for entry in parsed_gift_entries:
+        if entry['time'] < earliest_date:
+            earliest_date = entry['time']
+    
+    # Return the earliest date
+    return earliest_date
+
+
+def find_latest_date(parsed_gift_entries):
+    '''
+    Given a list of parsed gift entries,
+    this function finds the latest date
+    among them.
+    '''
+
+    # Create a basic max date object to start comparisons
+    latest_date = datetime.min
+
+    # Iterate through gift entries
+    for entry in parsed_gift_entries:
+        if entry['time'] > latest_date:
+            latest_date = entry['time']
+    
+    # Return the latest date
+    return latest_date
+
+
+def add_entry_to_calendar(entry, calendar, start_date):
+    '''
+    Adds a single entry to the calendar
+    '''
+
+    # Store the number of minutes in a day
+    mins_in_day = 1440
+
+    # Figure out when this entry is inserted into the calendar 
+    insert_point = int((entry['time'] - start_date).total_seconds()/60)
+
+    # For each item in the calendar between the time on the entry
+    # and 24 hours after the time on the entry, add the value of the
+    # entry to that item.
+
+    # Set the starting point of the counter to where this entry is inserted
+    counter = insert_point
+
+    # Iterate through the 24 hour period that this gift entry affects
+    for item in calendar[insert_point:insert_point + mins_in_day]:
+        
+        # Add the value of the entry to the calendar for that minute
+        calendar[counter] += entry['value']
+
+        # Increase counter to iterate
+        counter += 1
+    
+    # Return the calendar with the single entry added
+    return calendar
+
+
+def find_earliest_sell_date(calendar, start_date, desired_sell_price):
+    '''
+    Iterates through all entries in the calendar
+    after the current time to find the next
+    possible time that you will be eligible to sell
+    a ship of the specified input price.
+    '''
+
+    # Store the max amount of money that can be gifted in 24h
+    max_gift_value_per_day = 1000
+
+    # Find where the current time is on the calendar object
+    starting_point = int((datetime.utcnow() - start_date).total_seconds()/60)
+
+    # Iterate through every minute after the current minute
+    counter = starting_point
+    for minute in calendar[starting_point:]:
+        if minute + desired_sell_price < max_gift_value_per_day:
+            break
+        counter += 1
+    
+    # Once the right minute is found, convert it into a date
+    earliest_sell_date = start_date + timedelta(minutes=counter)
+
+    # Return the earliest sell date
+    return earliest_sell_date 
+
 
 def main():
 
@@ -90,7 +270,14 @@ def main():
     
     # Parse the gift entries into dictionaries
     parsed_gift_entries = parse_gift_entries(raw_gift_entries)
-
+    
+    # Build calendar
+    calendar, start_date = build_calendar(parsed_gift_entries)
+    
+    # Find the earliest possible date that a ship of specified value could be sold
+    earliest_sell_date = find_earliest_sell_date(calendar, start_date, desired_sell_price)
+    
+    
 
 if __name__ == '__main__':
     main()
