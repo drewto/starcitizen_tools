@@ -8,4 +8,15 @@ This tool was built for SC ship traders. CIG has this annoying policy where you 
 
 This gets complicated when you're making lots of sales, so I built a program that ingests your hangar logs and the price of the ship you want to sell, builds a calendar, then tells you the next time that you will be able to sell a ship of that value.
 
-### Here's 
+### Usage
+
+##### Prerequisites
+
+1. Must have python3 installed and a basic understanding of how to execute python3 code
+2. Must have access to the RSI account that is to be analyzed
+
+##### Instructions
+
+1. Download `gift_calendar.py` from this folder
+2. Go to your RSI hangar and click on `Hangar log` (image below)
+![](images/hangar_log.png)
