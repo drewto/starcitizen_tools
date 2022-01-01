@@ -55,12 +55,14 @@ optional arguments:
 
 ##### Example usage
 
-If I made some sales recently and I wanted to know the next time I could sell a ship worth $355 USD and also see the raw calendar output, I would run the following command:
-```
-$ python3 gift_calendar.py -i hangar_log_file.txt -o calendar_output.txt -p 355
-```
+If I made some sales recently and I wanted to know the next time I could sell a ship worth $355 USD, I would run the following command:
 
-If I didn't care about the calendar output, I would run it as:
 ```
 $ python3 gift_calendar.py -i hangar_log_file.txt -p 355
+```
+
+If I also wanted the output of the raw calendar placed into a file called `calendar_output.txt`, I would run it as follows:
+
+```
+$ python3 gift_calendar.py -i hangar_log_file.txt -o calendar_output.txt -p 355
 ```
