@@ -57,7 +57,7 @@ optional arguments:
 
 #### Example usage
 
-If I made some sales recently and I wanted to know the next time I could sell a ship worth $355 USD, I would run the following command:
+If I made some sales recently and I wanted to know the next time I could sell a ship worth $355 USD, I would save my hangar logs to a file called `hangar_log_file.txt` and then run the following command:
 
 ```
 $ python3 gift_calendar.py -i hangar_log_file.txt -p 355
