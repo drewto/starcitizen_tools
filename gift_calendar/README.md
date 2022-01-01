@@ -53,7 +53,14 @@ optional arguments:
                         The price of the ship you want to gift.
 ```
 
-Example usage:
+##### Example usage
+
+If I made some sales recently and I wanted to know the next time I could sell a ship worth $355 USD and also see the raw calendar output, I would run the following command:
 ```
 $ python3 gift_calendar.py -i hangar_log_file.txt -o calendar_output.txt -p 355
+```
+
+If I didn't care about the calendar output, I would run it as:
+```
+$ python3 gift_calendar.py -i hangar_log_file.txt -p 355
 ```
