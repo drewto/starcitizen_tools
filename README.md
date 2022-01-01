@@ -6,7 +6,5 @@ For the time being, this repo contains tools I threw together to help organize s
 
 ## Tools
 
-### gift_calendar
+### [gift_calendar](gift_calendar)
 A tool that reads your SC hangar logs and tells you the next time you can sell a ship of a given value without being restricted by CIG's gifting limits
-
-[Link](gift_calendar)
