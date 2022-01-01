@@ -295,6 +295,7 @@ def announce_results(earliest_sell_date, desired_sell_price):
 
     print(f"The next time you will be able to gift a ship valued at ${desired_sell_price:.2f} will be at {earliest_sell_date} UTC (make sure to convert to your timezone)")
 
+
 def main():
 
     # Ingest input arguments
