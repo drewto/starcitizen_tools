@@ -61,8 +61,18 @@ If I made some sales recently and I wanted to know the next time I could sell a 
 $ python3 gift_calendar.py -i hangar_log_file.txt -p 355
 ```
 
+CLI output:
+
+```
+The next time you will be able to gift a ship valued at $355.00 will be at 2022-01-02 01:43:00 UTC (make sure to convert to your timezone)
+```
+
 If I also wanted the output of the raw calendar placed into a file called `calendar_output.txt`, I would run it as follows:
 
 ```
 $ python3 gift_calendar.py -i hangar_log_file.txt -o calendar_output.txt -p 355
 ```
+
+This would generate the same CLI output as the command before, but it would also create a new file called `calendar_output.txt` which would be populated by a calendar of the gifts in last 24h per minute. Example file [here](calendar_output.txt)
+
+
