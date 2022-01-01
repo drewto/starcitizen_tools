@@ -22,7 +22,7 @@ This gets complicated when you're making lots of sales, so I built a program tha
 ![](images/hangar_log.png)
 3. Copy all of the log events from the last 2 or 3 days just to be safe
 ![](images/hangar_logs.png)
-4. Copy them into a text file in the same folder as `gift_calendar.py`. Name the file whatever you want.
+4. Copy them into a text file in the same folder as `gift_calendar.py`. Name the file whatever you want. I did not upload a copy of my hangar logs to this repo for privacy reasons, although I did upload my calendar output. 
 5. Follow the usage instructions below: 
 ```
 $ python3 gift_calendar/gift_calendar.py -h
@@ -51,4 +51,9 @@ optional arguments:
                         calendar data.
   -p DESIREDSELLPRICE, --price DESIREDSELLPRICE
                         The price of the ship you want to gift.
+```
+
+Example usage:
+```
+$ python3 gift_calendar.py -i hangar_log_file.txt -o calendar_output.txt -p 355
 ```
