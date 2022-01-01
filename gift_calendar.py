@@ -246,8 +246,14 @@ def find_earliest_sell_date(calendar, start_date, desired_sell_price):
     # Iterate through every minute after the current minute
     counter = starting_point
     for minute in calendar[starting_point:]:
+
+        # If the current minute plus the desired sell price is less than
+        # CIG's max sell amount per day, you should be able to sell. 
+        # Therefore, this is the time we want to choose
         if minute + desired_sell_price < max_gift_value_per_day:
             break
+
+        # If not, move onto the next minute
         counter += 1
     
     # Once the right minute is found, convert it into a date
@@ -256,6 +262,38 @@ def find_earliest_sell_date(calendar, start_date, desired_sell_price):
     # Return the earliest sell date
     return earliest_sell_date 
 
+
+def save_calendar_to_file(calendar, start_date, output_file_name):
+    '''
+    Output a human-readable calendar
+    '''
+
+    # Open output file
+    with open(output_file_name, 'w') as outfile:
+
+        # Iterate through each minute in the calendar
+        counter = 0
+        for minute in calendar:
+
+            # Build human readable datetime for this minute
+            curr_datetime = start_date + timedelta(minutes=counter)
+
+            # Build output string for single line
+            out_string = f"{curr_datetime} -> ${minute:.2f} spent in last 24h.\n"
+
+            # Write output string to file
+            outfile.write(out_string)
+
+            # Iterate
+            counter += 1
+
+
+def announce_results(earliest_sell_date, desired_sell_price):
+    '''
+    Announces the results to the console for the user
+    '''
+
+    print(f"The next time you will be able to gift a ship valued at ${desired_sell_price:.2f} will be at {earliest_sell_date} UTC (make sure to convert to your timezone)")
 
 def main():
 
@@ -277,7 +315,13 @@ def main():
     # Find the earliest possible date that a ship of specified value could be sold
     earliest_sell_date = find_earliest_sell_date(calendar, start_date, desired_sell_price)
     
+    # Print human-readable output
+    announce_results(earliest_sell_date, desired_sell_price)
     
+    # Save the calendar to a file
+    if output_file_name is not None:
+        save_calendar_to_file(calendar, start_date, output_file_name)
+
 
 if __name__ == '__main__':
     main()
